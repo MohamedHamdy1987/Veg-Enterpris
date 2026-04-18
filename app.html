@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام إدارة الخضار والفواكه | Enterprise</title>
+  <link rel="manifest" href="manifest.json">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; }
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: #f4f7fc;
+      margin: 0;
+      height: 100vh;
+    }
+    .app { display: flex; height: 100%; }
+    .sidebar {
+      width: 240px;
+      background: #0f3b3a;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 0;
+    }
+    .sidebar button {
+      background: none;
+      border: none;
+      color: white;
+      padding: 14px 20px;
+      text-align: right;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s;
+      border-right: 4px solid transparent;
+    }
+    .sidebar button:hover {
+      background: #1a5c5a;
+      border-right-color: #ffd966;
+    }
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      background: white;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    #userInfo { font-weight: bold; }
+    #branchSelector { padding: 8px; border-radius: 8px; border: 1px solid #ccc; }
+    .page {
+      display: none;
+      padding: 24px;
+      overflow-y: auto;
+      background: #f4f7fc;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.03);
+      text-align: center;
+    }
+    .card h3 { font-weight: 600; margin-bottom: 8px; color: #1e3b3a; }
+    .table {
+      width: 100%;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      margin: 16px 0;
+      border-collapse: collapse;
+    }
+    .table th { background: #e9f0f0; padding: 12px; text-align: right; }
+    .table td { padding: 12px; border-bottom: 1px solid #e0e7e7; }
+    .btn {
+      background: #0f3b3a;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 5px;
+    }
+    .btn-sm { padding: 6px 12px; font-size: 14px; }
+    .full-width { width: 100%; padding: 10px; margin: 5px 0; border-radius: 8px; border: 1px solid #ccc; }
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: #22c55e;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 40px;
+      display: none;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      z-index: 10000;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .modal-content {
+      background: white;
+      padding: 24px;
+      border-radius: 24px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .hidden { display: none !important; }
+    #authScreen {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #e9f0f0;
+    }
+    #authScreen input { padding: 12px; width: 250px; margin: 8px; border-radius: 12px; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+
+<!-- شاشة تسجيل الدخول -->
+<div id="authScreen">
+  <div style="background:white; padding:40px; border-radius:32px; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.05);">
+    <h2>🔐 تسجيل الدخول</h2>
+    <input id="loginEmail" placeholder="البريد الإلكتروني" type="email"><br>
+    <input id="loginPassword" placeholder="كلمة المرور" type="password"><br>
+    <button onclick="login()" class="btn" style="width:100%;">دخول</button>
+    <p style="margin-top:16px;">ليس لديك حساب؟ <a href="#">سجل الآن</a></p>
+  </div>
+</div>
+
+<!-- التطبيق الرئيسي -->
+<div id="app" class="app hidden">
+
+  <!-- الشريط الجانبي -->
+  <div class="sidebar">
+    <div style="padding:20px; text-align:center; font-size:20px; font-weight:bold;">🍎 الخضار</div>
+    <button onclick="navigate('dashboard')">📊 الرئيسية</button>
+    <button onclick="navigate('sales')" data-permission="sales">🛒 المبيعات</button>
+    <button onclick="navigate('customers')" data-permission="customers">👥 العملاء</button>
+    <button onclick="navigate('suppliers')" data-permission="suppliers">🚚 الموردين</button>
+    <button onclick="navigate('khazna')" data-permission="collections">💰 الخزنة</button>
+    <button onclick="navigate('reports')" data-permission="reports">📊 التقارير</button>
+    <button onclick="navigate('admin')" id="adminBtn" style="display:none;">🛠 المشرف</button>
+    <button onclick="navigate('subscription')">💳 الاشتراك</button>
+    <button onclick="logout()" style="margin-top:auto;">🚪 خروج</button>
+  </div>
+
+  <!-- المحتوى الرئيسي -->
+  <div class="content">
+    <div class="header">
+      <div id="userInfo">👤 جاري التحميل...</div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <span>🏪 الفرع:</span>
+        <select id="branchSelector" onchange="
+          APP.currentBranchId = this.value;
+          APP.dbLoad().then(() => APP.navigate(APP.currentPage));
+        "></select>
+      </div>
+    </div>
+
+    <!-- شريط الإشعارات -->
+    <div id="notifications" style="background:#fff3cd; padding:8px 20px; font-size:14px;"></div>
+
+    <!-- صفحات التطبيق -->
+    <div id="dashboard" class="page"></div>
+    <div id="sales" class="page"></div>
+    <div id="customers" class="page"></div>
+    <div id="suppliers" class="page"></div>
+    <div id="khazna" class="page"></div>
+    <div id="reports" class="page"></div>
+    <div id="admin" class="page"></div>
+    <div id="subscription" class="page"></div>
+  </div>
+</div>
+
+<!-- نافذة منبثقة (مودال) -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <h2 id="modalTitle">عنوان</h2>
+    <div id="modalBody"></div>
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button id="modalSave" class="btn">حفظ</button>
+      <button onclick="APP.closeModal()" class="btn" style="background:#aaa;">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- توست -->
+<div id="toast"></div>
+
+<!-- السكريبتات -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="core.js"></script>
+<script src="renderers.js"></script>
+<script src="actions.js"></script>
+
+<script>
+  window.onload = () => {
+    APP.initApp();
+  };
+</script>
+</body>
+</html>
