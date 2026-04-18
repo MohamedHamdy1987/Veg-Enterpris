@@ -1,9 +1,157 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
-  <title>My App</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام إدارة الخضار والفواكه | الحل المتكامل</title>
+  <link rel="manifest" href="manifest.json">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(145deg, #f6fff8 0%, #e2f3e9 100%);
+      color: #1e3b3a;
+      line-height: 1.7;
+    }
+    .container { max-width: 1100px; margin: auto; padding: 20px; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+    }
+    .logo { font-size: 28px; font-weight: 900; color: #0f3b3a; }
+    .btn {
+      background: #0f3b3a;
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 40px;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+      transition: 0.3s;
+      box-shadow: 0 6px 14px rgba(15,59,58,0.2);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid #0f3b3a;
+      color: #0f3b3a;
+      box-shadow: none;
+    }
+    .hero {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      padding: 40px 0 80px;
+    }
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 900;
+      line-height: 1.3;
+      margin-bottom: 20px;
+    }
+    .highlight { color: #1a8c7a; border-bottom: 4px solid #ffd966; display: inline-block; }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 30px;
+      margin: 60px 0;
+    }
+    .feature-card {
+      background: white;
+      padding: 30px 20px;
+      border-radius: 28px;
+      text-align: center;
+      box-shadow: 0 20px 30px rgba(0,0,0,0.03);
+      transition: 0.2s;
+    }
+    .feature-card:hover { transform: translateY(-5px); }
+    .icon { font-size: 48px; margin-bottom: 20px; }
+    .pricing {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      margin: 60px 0;
+    }
+    .plan {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 32px;
+      width: 280px;
+      text-align: center;
+      box-shadow: 0 25px 40px rgba(0,0,0,0.05);
+    }
+    .plan h3 { font-size: 26px; margin-bottom: 10px; }
+    .price { font-size: 42px; font-weight: 900; color: #0f3b3a; margin: 20px 0; }
+    .plan ul { list-style: none; margin: 20px 0; }
+    .plan li { padding: 8px 0; border-bottom: 1px solid #eee; }
+    footer {
+      text-align: center;
+      padding: 40px 0;
+      color: #5b7f7d;
+    }
+    @media (max-width: 700px) {
+      .hero { flex-direction: column; text-align: center; }
+    }
+  </style>
 </head>
 <body>
-  <h1>اشتغل 🎉</h1>
+<div class="container">
+  <header>
+    <div class="logo">🍎 الخضار</div>
+    <div>
+      <a href="app.html" class="btn">تسجيل الدخول</a>
+      <a href="#pricing" class="btn btn-outline">الأسعار</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <h1>أدر <span class="highlight">محلك</span> بذكاء<br>وركّز على الربح</h1>
+      <p style="font-size:20px; margin:20px 0;">نظام سحابي متكامل لإدارة مبيعات الخضار والفواكه، متعدد الفروع، مع اشتراكات مرنة وتقارير لحظية.</p>
+      <a href="app.html" class="btn" style="font-size:20px;">ابدأ مجاناً 14 يوم</a>
+      <p style="margin-top:12px;">بدون بطاقة ائتمانية</p>
+    </div>
+    <div style="font-size:140px;">🧺🍅</div>
+  </section>
+
+  <section>
+    <h2 style="text-align:center; font-size:36px; margin-bottom:40px;">كل ما يحتاجه تاجر الخضار</h2>
+    <div class="features">
+      <div class="feature-card"><div class="icon">🛒</div><h3>نقطة بيع سريعة</h3><p>بيع نقدي وآجل بضغطة زر، وحساب تلقائي للرصيد.</p></div>
+      <div class="feature-card"><div class="icon">📦</div><h3>تتبع المخزون</h3><p>تنبيهات فورية عند انخفاض المخزون، وتقارير بالمنتجات الأكثر مبيعاً.</p></div>
+      <div class="feature-card"><div class="icon">👥</div><h3>حسابات العملاء</h3><p>كشف حساب كامل لكل عميل، مع مشاركة مباشرة عبر واتساب.</p></div>
+      <div class="feature-card"><div class="icon">🏪</div><h3>متعدد الفروع</h3><p>أدر عدة فروع من لوحة تحكم واحدة، مع عزل تام للبيانات.</p></div>
+      <div class="feature-card"><div class="icon">📊</div><h3>تقارير مالية</h3><p>الأرباح والمصروفات وصافي الدخل في رسم بياني واضح.</p></div>
+      <div class="feature-card"><div class="icon">🔔</div><h3>إشعارات ذكية</h3><p>تنبيهات نفاد المنتج والمدفوعات المعلقة.</p></div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <h2 style="text-align:center; font-size:36px;">خطط اشتراك بسيطة</h2>
+    <div class="pricing">
+      <div class="plan">
+        <h3>شهري</h3>
+        <div class="price">750 ج.م</div>
+        <ul><li>كل المميزات</li><li>دعم فني</li><li>تحديثات مجانية</li></ul>
+        <a href="app.html" class="btn">ابدأ الآن</a>
+      </div>
+      <div class="plan" style="border:2px solid #ffd966;">
+        <h3>سنوي</h3>
+        <div class="price">6,000 ج.م</div>
+        <ul><li>كل مميزات الشهري</li><li>توفير 25%</li><li>شهرين مجاناً</li></ul>
+        <a href="app.html" class="btn">وفر أكثر</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2025 نظام الخضار · جميع الحقوق محفوظة</p>
+    <p style="margin-top:12px;"><a href="help.html">المساعدة</a> · <a href="#">سياسة الخصوصية</a></p>
+  </footer>
+</div>
 </body>
 </html>
