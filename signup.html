@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل جديد - نظام الخضار</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(145deg, #f6fff8 0%, #e2f3e9 100%);
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .signup-box {
+      background: white;
+      padding: 40px;
+      border-radius: 32px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 20px 30px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+    h2 { color: #0f3b3a; margin-bottom: 20px; }
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      border-radius: 40px;
+      border: 1px solid #ccc;
+      font-family: 'Cairo', sans-serif;
+    }
+    .btn {
+      background: #0f3b3a;
+      color: white;
+      border: none;
+      padding: 14px;
+      width: 100%;
+      border-radius: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .login-link {
+      margin-top: 20px;
+      display: block;
+      color: #1e3b3a;
+    }
+    #errorMsg { color: red; margin-top: 10px; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+</head>
+<body>
+
+<div class="signup-box">
+  <h2>🍎 تجربة مجانية 14 يوم</h2>
+  <p style="color:#3b6b68;">أنشئ حسابك وابدأ إدارة محلك الآن</p>
+
+  <input type="text" id="shopName" placeholder="اسم المحل" autocomplete="off">
+  <input type="email" id="signupEmail" placeholder="البريد الإلكتروني" autocomplete="email">
+  <input type="password" id="signupPassword" placeholder="كلمة المرور" autocomplete="new-password">
+
+  <button class="btn" onclick="signup()">ابدأ الفترة التجريبية</button>
+
+  <div id="errorMsg"></div>
+  <a href="index.html" class="login-link">لديك حساب بالفعل؟ تسجيل الدخول</a>
+</div>
+
+<script>
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  async function signup() {
+    const shopName = document.getElementById('shopName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const errorDiv = document.getElementById('errorMsg');
+
+    if (!shopName || !email || !password) {
+      errorDiv.innerText = 'جميع الحقول مطلوبة';
+      return;
+    }
+
+    // 1) إنشاء المستخدم في Auth مع metadata فيها اسم المحل
+    const { data, error } = await sb.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          shop_name: shopName
+        }
+      }
+    });
+
+    if (error) {
+      errorDiv.innerText = 'خطأ: ' + error.message;
+      return;
+    }
+
+    const user = data.user;
+    if (!user) {
+      errorDiv.innerText = 'لم يتم إنشاء المستخدم';
+      return;
+    }
+
+    // 2) إضافة اشتراك تجريبي تلقائي (14 يوم)
+    const trialEnd = new Date();
+    trialEnd.setDate(trialEnd.getDate() + 14);
+
+    const { error: subError } = await sb
+      .from('subscriptions')
+      .insert({
+        user_id: user.id,
+        plan: 'trial',
+        start_date: new Date().toISOString(),
+        end_date: trialEnd.toISOString(),
+        status: 'active'
+      });
+
+    // حتى لو فشل إدراج الاشتراك لسبب ما، نكمل تسجيل الدخول
+    // 3) تسجيل الدخول تلقائيًا
+    const { error: loginError } = await sb.auth.signInWithPassword({ email, password });
+    if (loginError) {
+      errorDiv.innerText = 'تم التسجيل ولكن فشل الدخول التلقائي. حاول تسجيل الدخول يدويًا.';
+      setTimeout(() => { window.location.href = 'app.html'; }, 2000);
+      return;
+    }
+
+    // 4) التوجيه للتطبيق
+    window.location.href = 'app.html';
+  }
+</script>
+</body>
+</html>
