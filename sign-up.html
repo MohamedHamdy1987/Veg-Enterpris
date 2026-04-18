@@ -84,25 +84,23 @@
       return;
     }
 
-    // 1) إنشاء المستخدم في Auth مع metadata فيها اسم المحل
+    // 1) إنشاء المستخدم في Auth
     const { data, error } = await sb.auth.signUp({
       email,
       password,
       options: {
-        data: {
-          shop_name: shopName
-        }
+        data: { shop_name: shopName }
       }
     });
 
     if (error) {
-      errorDiv.innerText = 'خطأ: ' + error.message;
+      errorDiv.innerText = 'خطأ في التسجيل: ' + error.message;
       return;
     }
 
     const user = data.user;
     if (!user) {
-      errorDiv.innerText = 'لم يتم إنشاء المستخدم';
+      errorDiv.innerText = 'لم يتم إنشاء المستخدم. حاول مجدداً.';
       return;
     }
 
@@ -110,26 +108,24 @@
     const trialEnd = new Date();
     trialEnd.setDate(trialEnd.getDate() + 14);
 
-    const { error: subError } = await sb
-      .from('subscriptions')
-      .insert({
-        user_id: user.id,
-        plan: 'trial',
-        start_date: new Date().toISOString(),
-        end_date: trialEnd.toISOString(),
-        status: 'active'
-      });
+    await sb.from('subscriptions').insert({
+      user_id: user.id,
+      plan: 'trial',
+      start_date: new Date().toISOString(),
+      end_date: trialEnd.toISOString(),
+      status: 'active'
+    });
 
-    // حتى لو فشل إدراج الاشتراك لسبب ما، نكمل تسجيل الدخول
-    // 3) تسجيل الدخول تلقائيًا
+    // 3) تسجيل الدخول التلقائي
     const { error: loginError } = await sb.auth.signInWithPassword({ email, password });
     if (loginError) {
-      errorDiv.innerText = 'تم التسجيل ولكن فشل الدخول التلقائي. حاول تسجيل الدخول يدويًا.';
+      // حتى لو فشل الدخول التلقائي، نوجه المستخدم لصفحة الدخول
+      errorDiv.innerText = 'تم التسجيل! جاري توجيهك لصفحة الدخول...';
       setTimeout(() => { window.location.href = 'app.html'; }, 2000);
       return;
     }
 
-    // 4) التوجيه للتطبيق
+    // 4) نجاح التسجيل والدخول -> انتقل للتطبيق
     window.location.href = 'app.html';
   }
 </script>
