@@ -6,8 +6,8 @@
 'use strict';
 
 // ── CONFIG — Replace with your Supabase project values ──────
-const SUPABASE_URL     = 'https://YOUR_PROJECT.supabase.co';
-const SUPABASE_ANON    = 'YOUR_ANON_KEY';
+const SUPABASE_URL     = 'https://oawtdxkylwujcvdzfasn.supabase.co/rest/v1/';
+const SUPABASE_ANON    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hd3RkeGt5bHd1amN2ZHpmYXNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MjMxMjcsImV4cCI6MjA5MjA5OTEyN30.1BvWh200IjumJ5v2JLh0bSZNhIgzQLrTrDSr_EJfFAQ';
 const EDGE_BASE        = `${SUPABASE_URL}/functions/v1`;
 
 // ── Supabase Client ──────────────────────────────────────────
