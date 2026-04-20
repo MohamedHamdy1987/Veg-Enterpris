@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام محل الخضار والفواكه</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body { font-family: sans-serif; text-align:center; padding:50px }
+    button { padding:10px 20px; margin:10px; }
+  </style>
+</head>
+
+<body>
+
+<h1>نظام إدارة الخضار والفواكه</h1>
+
+<button onclick="openSignup()">إنشاء حساب</button>
+<button onclick="openLogin()">تسجيل دخول</button>
+
+<div id="auth" style="display:none;">
+  <input id="email" placeholder="Email"><br><br>
+  <input id="password" type="password" placeholder="Password"><br><br>
+  <button onclick="submitAuth()">تأكيد</button>
+</div>
+
+<script>
+const SUPABASE_URL = "https://oawtdxkylwujcvdzfasn.supabase.co/rest/v1/";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hd3RkeGt5bHd1amN2ZHpmYXNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MjMxMjcsImV4cCI6MjA5MjA5OTEyN30.1BvWh200IjumJ5v2JLh0bSZNhIgzQLrTrDSr_EJfFAQ";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let mode = "login";
+
+function openSignup() {
+  mode = "signup";
+  document.getElementById("auth").style.display = "block";
+}
+
+function openLogin() {
+  mode = "login";
+  document.getElementById("auth").style.display = "block";
+}
+
+async function submitAuth() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  if (mode === "signup") {
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) return alert(error.message);
+    alert("تم إنشاء الحساب");
+  }
+
+  if (mode === "login") {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) return alert(error.message);
+
+    window.location.href = "app.html";
+  }
+}
+</script>
+
+</body>
+</html>
