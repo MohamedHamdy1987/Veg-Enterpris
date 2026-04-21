@@ -2,7 +2,7 @@
 
 /* ================= CONFIG ================= */
 const SUPABASE_URL = 'https://oawtdxkylwujcvdzfasn.supabase.co';
-const SUPABASE_ANON = 'PUT_YOUR_ANON_KEY';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFsaXh3ZG9tc2h2b2NlcnhwYW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0Mzc3MTMsImV4cCI6MjA5MjAxMzcxM30.PFSAQ4J6WBLPHiTpgED7l4JiK4jmhL82MQFuJogwZhs';
 
 if (!window.supabase) {
   alert("❌ Supabase library not loaded");
