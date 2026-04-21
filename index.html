@@ -2,205 +2,158 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام محل الخضار والفواكه</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>نظام إدارة المحل</title>
+  <!-- الخط -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
-    /* نفس التنسيقات الجميلة بدون تغيير */
-    :root {
-      --primary-green-light: #b8e0b5;
-      --primary-green-dark: #5c8f4c;
-      --primary-red-light: #f8d7da;
-      --white: #ffffff;
-      --bg-light: #f1f3f5;
-      --text-dark: #2d3e2b;
-      --text-soft: #4a6b3f;
-      --border-light: #dde6d5;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Cairo', sans-serif;
-      background-color: var(--bg-light);
-      color: var(--text-dark);
-      line-height: 1.6;
-    }
-    nav {
-      position: sticky; top: 0; z-index: 50;
-      background: var(--white); padding: 14px 24px;
-      display: flex; justify-content: space-between; align-items: center;
-      box-shadow: var(--shadow-sm); border-bottom: 1px solid var(--border-light);
-    }
-    .nav-logo { font-size: 20px; font-weight: 900; color: var(--primary-green-dark); }
-    .nav-buttons { display: flex; gap: 10px; }
-    .nav-btn {
-      padding: 10px 20px; border-radius: 30px; font-weight: 700; font-size: 14px;
-      cursor: pointer; font-family: 'Cairo', sans-serif; transition: 0.2s;
-      border: 1.5px solid transparent;
-    }
-    .btn-outline-nav {
-      background: transparent; border-color: var(--primary-green-dark);
-      color: var(--primary-green-dark);
-    }
-    .btn-primary-nav {
-      background: var(--primary-green-dark); border-color: var(--primary-green-dark);
-      color: white;
-    }
-    .hero {
-      background: linear-gradient(135deg, var(--primary-green-light) 0%, var(--bg-light) 100%);
-      text-align: center; padding: 70px 20px 80px;
-    }
-    .hero h1 { font-size: clamp(26px, 6vw, 44px); font-weight: 900; margin-bottom: 16px; }
-    .hero p { font-size: clamp(15px, 3vw, 18px); color: var(--text-soft); max-width: 560px; margin: 0 auto 28px; }
-    .hero-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
-    .btn-white {
-      padding: 14px 28px; background: var(--white); color: var(--primary-green-dark);
-      border: none; border-radius: 40px; font-weight: 800; font-size: 16px;
-      cursor: pointer; box-shadow: var(--shadow-sm);
-    }
-    .btn-outline-white {
-      padding: 14px 28px; background: transparent; color: var(--primary-green-dark);
-      border: 2px solid var(--white); border-radius: 40px; font-weight: 700; font-size: 16px;
-      cursor: pointer; background-color: rgba(255,255,255,0.2);
-    }
-    .section { padding: 60px 20px; text-align: center; background: var(--white); }
-    .container { max-width: 1000px; margin: 0 auto; }
-    .section-title { font-size: clamp(22px, 4vw, 28px); font-weight: 900; margin-bottom: 8px; color: var(--primary-green-dark); }
-    .features-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 18px; margin-top: 20px;
-    }
-    .feature-card {
-      background: var(--white); padding: 24px 18px; border-radius: 20px;
-      border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);
-    }
-    .feature-icon { font-size: 32px; margin-bottom: 10px; }
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
-      display: none; align-items: center; justify-content: center;
-      z-index: 1000; padding: 16px;
-    }
-    .auth-modal {
-      background: var(--white); border-radius: 32px; padding: 32px 28px;
-      max-width: 460px; width: 100%; box-shadow: 0 20px 30px rgba(0,0,0,0.1);
-      border: 1px solid var(--border-light); position: relative;
-    }
-    .modal-close {
-      position: absolute; top: 16px; left: 16px;
-      background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-soft);
-    }
-    .auth-tabs {
-      display: flex; gap: 10px; margin-bottom: 28px;
-      border-bottom: 2px solid var(--border-light); padding-bottom: 12px;
-    }
-    .auth-tab {
-      flex: 1; text-align: center; padding: 10px; font-weight: 700; font-size: 18px;
-      cursor: pointer; border-radius: 30px; background: transparent; border: none;
-      color: var(--text-soft); font-family: 'Cairo', sans-serif;
-    }
-    .auth-tab.active { color: var(--primary-green-dark); background: rgba(92, 143, 76, 0.08); }
-    .auth-form { display: flex; flex-direction: column; gap: 18px; }
-    .form-group input {
-      padding: 16px 18px; border: 1.5px solid var(--border-light);
-      border-radius: 16px; font-family: 'Cairo', sans-serif; font-size: 16px;
-      width: 100%;
-    }
-    .btn-auth {
-      background: var(--primary-green-dark); color: white; border: none;
-      padding: 16px; border-radius: 16px; font-weight: 700; font-size: 18px;
-      cursor: pointer; margin-top: 10px;
-    }
-    .error-message { color: #c95a4a; font-size: 14px; min-height: 24px; text-align: center; }
-    .success-message { color: #2E7D32; font-size: 14px; text-align: center; }
-    .hidden { display: none !important; }
+    /* أنماط بسيطة وقوية */
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Cairo',sans-serif;background:#f5f7fa;color:#1e293b;line-height:1.6;}
+    .container{max-width:1200px;margin:0 auto;padding:0 20px;}
+    nav{background:white;padding:15px 20px;box-shadow:0 2px 4px rgba(0,0,0,0.05);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;}
+    .logo{font-size:1.5rem;font-weight:900;color:#16a34a;}
+    .nav-btns{display:flex;gap:10px;}
+    .btn{padding:10px 20px;border-radius:30px;font-weight:700;font-size:14px;cursor:pointer;border:none;transition:0.2s;}
+    .btn-outline{background:transparent;border:2px solid #16a34a;color:#16a34a;}
+    .btn-solid{background:#16a34a;color:white;}
+    .hero{text-align:center;padding:60px 20px;background:linear-gradient(145deg, #dcfce7 0%, #f8fafc 100%);}
+    .hero h1{font-size:clamp(2rem, 8vw, 3.5rem);font-weight:900;margin-bottom:16px;color:#0f172a;}
+    .hero p{font-size:1.2rem;color:#334155;max-width:600px;margin:0 auto 30px;}
+    .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:20px;margin-top:40px;}
+    .feat-card{background:white;padding:24px 16px;border-radius:24px;box-shadow:0 4px 6px -2px rgba(0,0,0,0.05);border:1px solid #e2e8f0;}
+    .feat-icon{font-size:32px;margin-bottom:12px;}
+    /* Modal */
+    .modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px;}
+    .modal-card{background:white;border-radius:32px;padding:32px 24px;max-width:440px;width:100%;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);position:relative;}
+    .close-btn{position:absolute;top:16px;left:16px;background:none;border:none;font-size:28px;cursor:pointer;color:#64748b;}
+    .tabs{display:flex;gap:8px;margin-bottom:28px;border-bottom:2px solid #e2e8f0;padding-bottom:12px;}
+    .tab{flex:1;text-align:center;padding:12px;font-weight:700;font-size:18px;cursor:pointer;border-radius:30px;background:transparent;border:none;color:#64748b;}
+    .tab.active{background:#f0fdf4;color:#16a34a;}
+    .form-group{margin-bottom:20px;}
+    .form-group input{width:100%;padding:16px 18px;border:2px solid #e2e8f0;border-radius:18px;font-size:16px;font-family:'Cairo',sans-serif;}
+    .form-group input:focus{outline:none;border-color:#16a34a;}
+    .btn-primary{width:100%;padding:16px;background:#16a34a;color:white;border:none;border-radius:18px;font-size:18px;font-weight:700;cursor:pointer;margin-top:8px;}
+    .error{color:#dc2626;font-size:14px;margin-top:8px;text-align:center;}
+    .success{color:#16a34a;font-size:14px;margin-top:8px;text-align:center;}
+    .hidden{display:none !important;}
+    .dashboard{padding:20px;}
+    .card{background:white;border-radius:24px;padding:20px;box-shadow:0 4px 6px -2px rgba(0,0,0,0.05);border:1px solid #e2e8f0;}
+    .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .footer{text-align:center;padding:20px;color:#64748b;}
   </style>
 </head>
 <body>
 
+<!-- شريط التنقل -->
 <nav>
-  <div class="nav-logo">🍊 نظام المحل</div>
-  <div class="nav-buttons">
-    <!-- تأكد من وجود onclick الصحيح -->
-    <button class="nav-btn btn-outline-nav" onclick="openAuthModal('login')">تسجيل الدخول</button>
-    <button class="nav-btn btn-primary-nav" onclick="openAuthModal('signup')">جرب مجاناً</button>
+  <div class="logo">🍊 سوق الجملة</div>
+  <div class="nav-btns">
+    <button class="btn btn-outline" onclick="openModal('login')">تسجيل الدخول</button>
+    <button class="btn btn-solid" onclick="openModal('signup')">جرب مجاناً</button>
   </div>
 </nav>
 
-<div class="hero">
-  <h1>نظام إدارة الخضار والفواكه</h1>
-  <p>تابع حساباتك بدقة، عرف فلوسك كل يوم، وفر وقتك وجهدك</p>
-  <div class="hero-btns">
-    <button class="btn-white" onclick="openAuthModal('signup')">🚀 ابدأ التجربة المجانية</button>
-    <button class="btn-outline-white" onclick="contactWhatsApp()">💬 تواصل معنا</button>
+<!-- المحتوى الرئيسي (يظهر للمستخدم غير المسجل) -->
+<div id="publicContent">
+  <div class="hero">
+    <h1>نظام إدارة الخضار والفواكه</h1>
+    <p>حسابات دقيقة، فواتير أوتوماتيك، كشوف حسابات فورية. وفر وقتك وجهدك.</p>
+    <div>
+      <button class="btn btn-solid" style="padding:16px 32px;font-size:18px;" onclick="openModal('signup')">🚀 ابدأ التجربة المجانية</button>
+      <button class="btn btn-outline" style="padding:16px 32px;font-size:18px;" onclick="contactWhatsApp()">💬 تواصل معنا</button>
+    </div>
+    <div class="features container">
+      <div class="feat-card"><div class="feat-icon">🛒</div><h3>فواتير بيع وشراء</h3></div>
+      <div class="feat-card"><div class="feat-icon">👥</div><h3>حسابات العملاء</h3></div>
+      <div class="feat-card"><div class="feat-icon">🚚</div><h3>حسابات الموردين</h3></div>
+      <div class="feat-card"><div class="feat-icon">💰</div><h3>صندوق اليومية</h3></div>
+    </div>
+  </div>
+  <div class="footer">© 2025 نظام إدارة سوق الجملة</div>
+</div>
+
+<!-- المحتوى الخاص بالتطبيق (يظهر بعد تسجيل الدخول) -->
+<div id="appContent" class="hidden dashboard">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+    <h2>لوحة التحكم</h2>
+    <button class="btn btn-outline" onclick="logout()">تسجيل الخروج</button>
+  </div>
+  <div class="stat-grid">
+    <div class="card">💰 رصيد الصندوق: <span id="cashBalance">—</span> ج</div>
+    <div class="card">📊 مبيعات اليوم: <span id="todaySales">—</span> ج</div>
+  </div>
+  <div style="margin-top:30px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+    <button class="btn btn-solid" onclick="quickAction('sale')">فاتورة بيع</button>
+    <button class="btn btn-solid" onclick="quickAction('purchase')">فاتورة شراء</button>
+    <button class="btn btn-outline" onclick="quickAction('customer')">إضافة عميل</button>
+    <button class="btn btn-outline" onclick="quickAction('supplier')">إضافة مورد</button>
   </div>
 </div>
 
-<div class="section container">
-  <p class="section-title">🚀 كل اللي محتاجه في مكان واحد</p>
-  <div class="features-grid">
-    <div class="feature-card"><div class="feature-icon">🛒</div><h3>تسجيل المبيعات</h3></div>
-    <div class="feature-card"><div class="feature-icon">👥</div><h3>حسابات العملاء</h3></div>
-    <div class="feature-card"><div class="feature-icon">🚚</div><h3>حسابات الموردين</h3></div>
-    <div class="feature-card"><div class="feature-icon">💰</div><h3>الخزنة</h3></div>
-  </div>
-</div>
-
-<!-- نافذة تسجيل الدخول / إنشاء حساب -->
-<div class="modal-overlay" id="authModal">
-  <div class="auth-modal">
-    <button class="modal-close" onclick="closeAuthModal()">&times;</button>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="modalTabLogin">تسجيل الدخول</button>
-      <button class="auth-tab" id="modalTabSignup">حساب جديد</button>
+<!-- المودال -->
+<div class="modal" id="authModal">
+  <div class="modal-card">
+    <button class="close-btn" onclick="closeModal()">&times;</button>
+    <div class="tabs">
+      <button class="tab active" id="tabLogin" onclick="switchTab('login')">دخول</button>
+      <button class="tab" id="tabSignup" onclick="switchTab('signup')">حساب جديد</button>
     </div>
 
-    <form id="modalLoginForm" class="auth-form">
-      <div class="form-group"><input type="email" id="modalLoginEmail" placeholder="البريد الإلكتروني" required></div>
-      <div class="form-group"><input type="password" id="modalLoginPassword" placeholder="كلمة المرور" required></div>
-      <button type="submit" class="btn-auth">دخول</button>
-      <div id="modalLoginError" class="error-message"></div>
+    <!-- نموذج الدخول -->
+    <form id="loginForm">
+      <div class="form-group"><input type="email" id="loginEmail" placeholder="البريد الإلكتروني" required></div>
+      <div class="form-group"><input type="password" id="loginPassword" placeholder="كلمة المرور" required></div>
+      <button type="submit" class="btn-primary">دخول</button>
+      <div id="loginError" class="error"></div>
     </form>
 
-    <form id="modalSignupForm" class="auth-form hidden">
-      <div class="form-group"><input type="text" id="modalShopName" placeholder="اسم المحل" required></div>
-      <div class="form-group"><input type="email" id="modalSignupEmail" placeholder="البريد الإلكتروني" required></div>
-      <div class="form-group"><input type="password" id="modalSignupPassword" placeholder="كلمة المرور" required></div>
-      <div class="form-group"><input type="password" id="modalSignupConfirm" placeholder="تأكيد كلمة المرور" required></div>
-      <button type="submit" class="btn-auth">إنشاء حساب</button>
-      <div id="modalSignupError" class="error-message"></div>
-      <div id="modalSignupSuccess" class="success-message"></div>
+    <!-- نموذج الاشتراك -->
+    <form id="signupForm" class="hidden">
+      <div class="form-group"><input type="text" id="signupShopName" placeholder="اسم المحل" required></div>
+      <div class="form-group"><input type="email" id="signupEmail" placeholder="البريد الإلكتروني" required></div>
+      <div class="form-group"><input type="password" id="signupPassword" placeholder="كلمة المرور (6 أحرف على الأقل)" required></div>
+      <div class="form-group"><input type="password" id="signupConfirm" placeholder="تأكيد كلمة المرور" required></div>
+      <button type="submit" class="btn-primary">إنشاء حساب</button>
+      <div id="signupError" class="error"></div>
+      <div id="signupSuccess" class="success"></div>
     </form>
   </div>
 </div>
 
 <script>
-  // ===================== تكوين Supabase =====================
+  // ==================== الإعداد ====================
   const SUPABASE_URL = 'https://oawtdxkylwujcvdzfasn.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hd3RkeGt5bHd1amN2ZHpmYXNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MjMxMjcsImV4cCI6MjA5MjA5OTEyN30.1BvWh200IjumJ5v2JLh0bSZNhIgzQLrTrDSr_EJfFAQ';
   const WHATSAPP = "https://wa.me/01000890239";
 
-  // إنشاء عميل Supabase
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
   
-  // دالة واتساب
+  // ==================== دوال مساعدة ====================
   window.contactWhatsApp = () => window.open(WHATSAPP, "_blank");
-
-  // عناصر النافذة المنبثقة
-  const modal = document.getElementById('authModal');
-  const tabLogin = document.getElementById('modalTabLogin');
-  const tabSignup = document.getElementById('modalTabSignup');
-  const loginForm = document.getElementById('modalLoginForm');
-  const signupForm = document.getElementById('modalSignupForm');
-  const loginError = document.getElementById('modalLoginError');
-  const signupError = document.getElementById('modalSignupError');
-  const signupSuccess = document.getElementById('modalSignupSuccess');
-
-  // دالة فتح النافذة المنبثقة (تعمل لكلا الزرين)
-  window.openAuthModal = (mode) => {
-    if (mode === 'signup') {
+  
+  function openModal(type) {
+    document.getElementById('authModal').style.display = 'flex';
+    if (type === 'signup') switchTab('signup');
+    else switchTab('login');
+  }
+  
+  window.closeModal = () => {
+    document.getElementById('authModal').style.display = 'none';
+  };
+  
+  window.switchTab = (tab) => {
+    const tabLogin = document.getElementById('tabLogin');
+    const tabSignup = document.getElementById('tabSignup');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const loginError = document.getElementById('loginError');
+    const signupError = document.getElementById('signupError');
+    const signupSuccess = document.getElementById('signupSuccess');
+    
+    if (tab === 'signup') {
       tabSignup.classList.add('active');
       tabLogin.classList.remove('active');
       signupForm.classList.remove('hidden');
@@ -211,96 +164,121 @@
       loginForm.classList.remove('hidden');
       signupForm.classList.add('hidden');
     }
-    // مسح الرسائل القديمة
     loginError.textContent = '';
     signupError.textContent = '';
     signupSuccess.textContent = '';
-    modal.style.display = 'flex';
   };
 
-  // دالة إغلاق النافذة
-  window.closeAuthModal = () => {
-    modal.style.display = 'none';
-  };
-
-  // التبديل بين التبويبات
-  tabLogin.addEventListener('click', () => openAuthModal('login'));
-  tabSignup.addEventListener('click', () => openAuthModal('signup'));
-  
-  // إغلاق النافذة عند الضغط خارجها
-  modal.addEventListener('click', (e) => { if (e.target === modal) closeAuthModal(); });
-
-  // ===================== تسجيل الدخول =====================
-  loginForm.addEventListener('submit', async (e) => {
+  // ==================== المصادقة ====================
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('modalLoginEmail').value.trim();
-    const password = document.getElementById('modalLoginPassword').value.trim();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+    const errorEl = document.getElementById('loginError');
     
     if (!email || !password) {
-      loginError.textContent = 'جميع الحقول مطلوبة';
+      errorEl.textContent = 'جميع الحقول مطلوبة';
       return;
     }
-
+    
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      loginError.textContent = error.message;
+      errorEl.textContent = error.message;
     } else {
-      window.location.href = 'app.html';
+      // نجاح الدخول – سنقوم بتحديث الواجهة بعد التحقق من الجلسة
+      location.reload();
     }
   });
 
-  // ===================== إنشاء حساب =====================
-  signupForm.addEventListener('submit', async (e) => {
+  document.getElementById('signupForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const shopName = document.getElementById('modalShopName').value.trim();
-    const email = document.getElementById('modalSignupEmail').value.trim();
-    const pass = document.getElementById('modalSignupPassword').value.trim();
-    const confirm = document.getElementById('modalSignupConfirm').value.trim();
-
+    const shopName = document.getElementById('signupShopName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const pass = document.getElementById('signupPassword').value.trim();
+    const confirm = document.getElementById('signupConfirm').value.trim();
+    const errorEl = document.getElementById('signupError');
+    const successEl = document.getElementById('signupSuccess');
+    
     if (!shopName || !email || !pass || !confirm) {
-      signupError.textContent = 'جميع الحقول مطلوبة';
+      errorEl.textContent = 'جميع الحقول مطلوبة';
       return;
     }
     if (pass !== confirm) {
-      signupError.textContent = 'كلمة المرور غير متطابقة';
+      errorEl.textContent = 'كلمة المرور غير متطابقة';
       return;
     }
     if (pass.length < 6) {
-      signupError.textContent = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+      errorEl.textContent = 'كلمة المرور 6 أحرف على الأقل';
       return;
     }
-
+    
     const { data, error } = await supabase.auth.signUp({
       email,
       password: pass,
       options: { data: { full_name: shopName } }
     });
-
+    
     if (error) {
-      signupError.textContent = error.message;
+      errorEl.textContent = error.message;
       return;
     }
-
+    
     if (data.user) {
-      // محاولة إنشاء متجر للمستخدم (قد تفشل إذا لم تكن الصلاحيات كافية، لكن التطبيق سيتعامل معها لاحقاً)
+      // إنشاء متجر
       try {
         const slug = shopName.replace(/\s+/g, '-').toLowerCase() + '-' + Date.now().toString(36);
         await supabase.from('shops').insert({ name: shopName, slug, owner_id: data.user.id });
-      } catch (shopErr) {
-        console.warn('تعذر إنشاء المتجر تلقائياً:', shopErr);
-      }
-
-      signupSuccess.textContent = 'تم إنشاء الحساب، جاري التحويل...';
-      signupError.textContent = '';
-      setTimeout(() => window.location.href = 'app.html', 1500);
+      } catch (e) { console.warn('تعذر إنشاء المتجر:', e); }
+      
+      successEl.textContent = 'تم إنشاء الحساب، جاري التحميل...';
+      errorEl.textContent = '';
+      setTimeout(() => location.reload(), 1500);
     } else {
-      signupSuccess.textContent = 'تم إرسال رابط تأكيد إلى بريدك الإلكتروني.';
+      successEl.textContent = 'تم إرسال رابط تأكيد إلى بريدك الإلكتروني.';
     }
   });
 
-  // اختبار سريع عند التحميل للتأكد من أن كل شيء يعمل
-  console.log('✅ تم تحميل الصفحة الرئيسية بنجاح');
-</script>
+  // ==================== تسجيل الخروج ====================
+  window.logout = async () => {
+    await supabase.auth.signOut();
+    location.reload();
+  };
 
+  // ==================== التحقق من الجلسة وعرض الواجهة المناسبة ====================
+  async function checkSession() {
+    const { data: { session } } = await supabase.auth.getSession();
+    const publicContent = document.getElementById('publicContent');
+    const appContent = document.getElementById('appContent');
+    
+    if (session) {
+      publicContent.classList.add('hidden');
+      appContent.classList.remove('hidden');
+      // تحميل بيانات بسيطة للوحة التحكم
+      loadDashboard();
+    } else {
+      publicContent.classList.remove('hidden');
+      appContent.classList.add('hidden');
+    }
+  }
+  
+  async function loadDashboard() {
+    // هنا سنقوم بتحميل رصيد الصندوق ومبيعات اليوم (نفس المنطق السابق ولكن مبسط)
+    // يمكنك إضافته لاحقاً
+    document.getElementById('cashBalance').innerText = '0.00';
+    document.getElementById('todaySales').innerText = '0.00';
+  }
+  
+  window.quickAction = (type) => {
+    alert('سيتم فتح ' + type + ' (تحت التطوير)');
+  };
+
+  // بدء التشغيل
+  checkSession();
+  
+  // إغلاق المودال عند النقر خارجه
+  document.getElementById('authModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('authModal')) closeModal();
+  });
+</script>
 </body>
 </html>
