@@ -331,129 +331,38 @@
 </div>
 
 <script>
-  // ===================== تكوين Supabase =====================
-  const SUPABASE_URL = 'https://oawtdxkylwujcvdzfasn.supabase.co'; // ⚠️ استبدل بقيمة مشروعك
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hd3RkeGt5bHd1amN2ZHpmYXNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MjMxMjcsImV4cCI6MjA5MjA5OTEyN30.1BvWh200IjumJ5v2JLh0bSZNhIgzQLrTrDSr_EJfFAQ';                   // ⚠️ استبدل بقيمة مشروعك
-  const WHATSAPP = "https://wa.me/01000890239";           // ⚠️ استبدل برقم واتساب
+  // ===================== اختبار الاتصال =====================
+  const SUPABASE_URL = 'https://oawtdxkylwujcvdzfasn.supabase.co'; // بدون rest/v1
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hd3RkeGt5bHd1amN2ZHpmYXNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MjMxMjcsImV4cCI6MjA5MjA5OTEyN30.1BvWh200IjumJ5v2JLh0bSZNhIgzQLrTrDSr_EJfFAQ';
+  const WHATSAPP = "https://wa.me/01000890239";
 
+  // إنشاء عميل Supabase
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-  window.contactWhatsApp = () => window.open(WHATSAPP, "_blank");
+  // دالة للتواصل مع واتساب
+  window.contactWhatsApp = () => {
+    alert("سيتم فتح واتساب: " + WHATSAPP);
+    window.open(WHATSAPP, "_blank");
+  };
 
-  const modal = document.getElementById('authModal');
-  const tabLogin = document.getElementById('modalTabLogin');
-  const tabSignup = document.getElementById('modalTabSignup');
-  const loginForm = document.getElementById('modalLoginForm');
-  const signupForm = document.getElementById('modalSignupForm');
-  const loginError = document.getElementById('modalLoginError');
-  const signupError = document.getElementById('modalSignupError');
-  const signupSuccess = document.getElementById('modalSignupSuccess');
-
+  // دالة مؤقتة لفتح المودال
   window.openAuthModal = (mode) => {
-    if (mode === 'signup') {
-      tabSignup.classList.add('active');
-      tabLogin.classList.remove('active');
-      signupForm.classList.remove('hidden');
-      loginForm.classList.add('hidden');
-    } else {
-      tabLogin.classList.add('active');
-      tabSignup.classList.remove('active');
-      loginForm.classList.remove('hidden');
-      signupForm.classList.add('hidden');
-    }
-    clearModalMessages();
-    modal.style.display = 'flex';
+    alert("تم استدعاء openAuthModal بنجاح! النمط: " + mode);
+    document.getElementById('authModal').style.display = 'flex';
   };
 
   window.closeAuthModal = () => {
-    modal.style.display = 'none';
+    document.getElementById('authModal').style.display = 'none';
   };
 
-  function clearModalMessages() {
-    loginError.textContent = '';
-    signupError.textContent = '';
-    signupSuccess.textContent = '';
-  }
-
-  tabLogin.addEventListener('click', () => openAuthModal('login'));
-  tabSignup.addEventListener('click', () => openAuthModal('signup'));
-
-  modal.addEventListener('click', (e) => { if (e.target === modal) closeAuthModal(); });
-
-  // ===================== تسجيل الدخول =====================
-  loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('modalLoginEmail').value.trim();
-    const password = document.getElementById('modalLoginPassword').value.trim();
-    if (!email || !password) { loginError.textContent = 'جميع الحقول مطلوبة'; return; }
-
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+  // اختبار Supabase
+  supabase.auth.getSession().then(({ data, error }) => {
     if (error) {
-      loginError.textContent = error.message;
+      alert("❌ فشل الاتصال بـ Supabase: " + error.message);
     } else {
-      window.location.href = 'app.html';
+      alert("✅ تم الاتصال بـ Supabase بنجاح!");
     }
   });
 
-  // ===================== إنشاء حساب =====================
-  signupForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const shopName = document.getElementById('modalShopName').value.trim();
-    const email = document.getElementById('modalSignupEmail').value.trim();
-    const pass = document.getElementById('modalSignupPassword').value.trim();
-    const confirm = document.getElementById('modalSignupConfirm').value.trim();
-
-    if (!shopName || !email || !pass || !confirm) {
-      signupError.textContent = 'جميع الحقول مطلوبة'; return;
-    }
-    if (pass !== confirm) {
-      signupError.textContent = 'كلمة المرور غير متطابقة'; return;
-    }
-    if (pass.length < 6) {
-      signupError.textContent = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'; return;
-    }
-
-    // 1. تسجيل المستخدم
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password: pass,
-      options: {
-        data: { full_name: shopName }
-      }
-    });
-
-    if (error) {
-      signupError.textContent = error.message;
-      return;
-    }
-
-    if (data.user) {
-      // 2. إنشاء متجر للمستخدم (نحتاج Service Role لكن لا نملكه هنا - سننشئه عبر دالة RPC أو نتركه للـ Trigger)
-      // لكن Trigger trg_shop_owner_membership يتطلب وجود shop مسبقاً. الأفضل إنشاء المتجر هنا.
-      // بما أننا لا نملك service_role في الواجهة الأمامية، سنستخدم RPC آمنة إذا وجدت،
-      // أو نعتمد على أن المستخدم سيُنشئ متجره عند أول دخول لـ app.html (كما في App.bootstrap).
-      // لكن لضمان التجربة، سنقوم بإنشاء المتجر مباشرة (سيتم رفضه إذا لم تكن الصلاحيات كافية).
-      try {
-        const slug = shopName.replace(/\s+/g, '-').toLowerCase() + '-' + Date.now().toString(36);
-        const { error: shopError } = await supabase
-          .from('shops')
-          .insert({ name: shopName, slug, owner_id: data.user.id });
-        
-        if (shopError) {
-          console.warn('تعذر إنشاء المتجر تلقائياً (سيتم إنشاؤه لاحقاً):', shopError.message);
-        }
-      } catch (shopErr) {
-        console.warn('خطأ أثناء إنشاء المتجر:', shopErr);
-      }
-
-      signupSuccess.textContent = 'تم إنشاء الحساب، جاري التحويل...';
-      signupError.textContent = '';
-      setTimeout(() => window.location.href = 'app.html', 1500);
-    } else {
-      signupSuccess.textContent = 'تم إرسال رابط تأكيد إلى بريدك الإلكتروني.';
-    }
-  });
+  console.log("✅ تم تحميل كود الاختبار بنجاح");
 </script>
-
-</body>
-</html>
