@@ -1,457 +1,249 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#22c55e" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="سوق الجملة" />
-  <title>سوق الجملة — نظام الإدارة</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="style.css" />
-  <!-- Supabase CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Souq SaaS</title>
+
+<link rel="stylesheet" href="style.css">
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 </head>
+
 <body>
 
-<!-- ── Toast Container ─────────────────────────────────── -->
-<div class="toast-container" id="toast-container"></div>
+<!-- Offline Badge -->
+<div id="offline-badge" class="offline-badge">⚠️ بدون إنترنت</div>
 
-<!-- ── Auth Screen ─────────────────────────────────────── -->
-<div id="auth-screen">
-  <div class="auth-logo">🌿</div>
-  <h1 class="auth-title">سوق الجملة</h1>
-  <p class="auth-sub">نظام إدارة متكامل لأسواق الخضار والفاكهة</p>
+<!-- Toast -->
+<div id="toast-container"></div>
+
+<!-- Auth Screen -->
+<div id="auth-screen" class="auth-screen hidden">
 
   <div class="auth-card">
+    <h2>Souq SaaS</h2>
+
     <div class="auth-tabs">
-      <button class="auth-tab active" onclick="App.Auth.showTab('login')">تسجيل الدخول</button>
-      <button class="auth-tab" onclick="App.Auth.showTab('register')">حساب جديد</button>
+      <button onclick="App.Auth.showTab('login')" class="auth-tab active">دخول</button>
+      <button onclick="App.Auth.showTab('register')" class="auth-tab">حساب جديد</button>
     </div>
 
-    <!-- Login Form -->
+    <!-- Login -->
     <div id="tab-login">
-      <div class="form-group">
-        <label class="form-label">البريد الإلكتروني</label>
-        <input type="email" id="login-email" class="form-control" placeholder="example@mail.com" dir="ltr" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">كلمة المرور</label>
-        <input type="password" id="login-password" class="form-control" placeholder="••••••••" dir="ltr" />
-      </div>
-      <button class="btn btn-primary btn-full" onclick="App.Auth.login()">دخول</button>
+      <input id="login-email" placeholder="Email">
+      <input id="login-password" type="password" placeholder="Password">
+      <button onclick="App.Auth.login()">تسجيل الدخول</button>
     </div>
 
-    <!-- Register Form -->
+    <!-- Register -->
     <div id="tab-register" class="hidden">
-      <div class="form-group">
-        <label class="form-label">الاسم الكامل</label>
-        <input type="text" id="reg-name" class="form-control" placeholder="اسمك الكامل" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">البريد الإلكتروني</label>
-        <input type="email" id="reg-email" class="form-control" placeholder="example@mail.com" dir="ltr" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">كلمة المرور</label>
-        <input type="password" id="reg-password" class="form-control" placeholder="8 أحرف على الأقل" dir="ltr" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">اسم المحل / السوق</label>
-        <input type="text" id="reg-shop" class="form-control" placeholder="سوق النور للخضار" />
-      </div>
-      <button class="btn btn-primary btn-full" onclick="App.Auth.register()">إنشاء الحساب</button>
+      <input id="reg-name" placeholder="الاسم">
+      <input id="reg-email" placeholder="Email">
+      <input id="reg-password" type="password" placeholder="Password">
+      <input id="reg-shop" placeholder="اسم المحل">
+      <button onclick="App.Auth.register()">إنشاء حساب</button>
     </div>
+
   </div>
 </div>
 
-<!-- ── App Shell ─────────────────────────────────────────── -->
+<!-- MAIN APP -->
 <div id="app" class="hidden">
 
-  <!-- Top Bar -->
-  <header class="topbar">
-    <div class="topbar-brand">
-      <div class="brand-icon">🌿</div>
-      <div>
-        <div class="brand-name" id="topbar-shop-name">السوق</div>
-        <div class="brand-sub" id="topbar-plan">مجاني</div>
-      </div>
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div>
+      <div id="topbar-shop-name">...</div>
+      <div id="topbar-plan"></div>
     </div>
-    <div class="topbar-actions">
-      <div class="offline-badge" id="offline-badge">⚡ غير متصل</div>
-      <button class="btn btn-ghost btn-sm" onclick="App.Auth.logout()">خروج</button>
+    <button onclick="App.Auth.logout()">خروج</button>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav">
+    <button class="nav-btn active" data-page="dashboard" onclick="App.Nav.go('dashboard')">الرئيسية</button>
+    <button class="nav-btn" data-page="parties" onclick="App.Nav.go('parties')">الأطراف</button>
+    <button class="nav-btn" data-page="invoices" onclick="App.Nav.go('invoices')">الفواتير</button>
+    <button class="nav-btn" data-page="payments" onclick="App.Nav.go('payments')">المدفوعات</button>
+    <button class="nav-btn" data-page="reports" onclick="App.Nav.go('reports')">التقارير</button>
+  </div>
+
+  <!-- ================= DASHBOARD ================= -->
+  <div id="page-dashboard" class="page active">
+    <h2>لوحة التحكم</h2>
+
+    <div class="stats-grid">
+      <div class="stat-card">الكاش<br><span id="stat-cash">0</span></div>
+      <div class="stat-card">المبيعات<br><span id="stat-sales">0</span></div>
+      <div class="stat-card">العملاء<br><span id="stat-customer-ar">0</span></div>
+      <div class="stat-card">الموردين<br><span id="stat-supplier-ap">0</span></div>
     </div>
-  </header>
 
-  <!-- Main Content -->
-  <main id="main-content">
+    <h3>آخر الفواتير</h3>
+    <div id="recent-invoices"></div>
+  </div>
 
-    <!-- ── DASHBOARD ──────────────────────────────────────── -->
-    <section class="page active" id="page-dashboard">
-      <h2 class="mb-3">لوحة التحكم</h2>
+  <!-- ================= PARTIES ================= -->
+  <div id="page-parties" class="page">
+    <h2>الأطراف</h2>
 
-      <div class="stats-grid" id="dashboard-stats">
-        <div class="stat-card">
-          <div class="stat-icon">💰</div>
-          <div class="stat-label">رصيد الصندوق</div>
-          <div class="stat-value positive num" id="stat-cash">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">📈</div>
-          <div class="stat-label">مبيعات اليوم</div>
-          <div class="stat-value num" id="stat-sales">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">👥</div>
-          <div class="stat-label">ذمم العملاء</div>
-          <div class="stat-value num" id="stat-customer-ar">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">🏭</div>
-          <div class="stat-label">ذمم الموردين</div>
-          <div class="stat-value num" id="stat-supplier-ap">—</div>
-        </div>
-      </div>
+    <div class="tabs">
+      <button class="party-tab-btn active" data-type="customer" onclick="App.Parties.setType('customer')">عملاء</button>
+      <button class="party-tab-btn" data-type="supplier" onclick="App.Parties.setType('supplier')">موردين</button>
+    </div>
 
-      <div class="quick-actions">
-        <div class="quick-action" onclick="App.Nav.go('invoices'); App.Invoices.openNew('sale')">
-          <span class="qa-icon">🛒</span>
-          <span class="qa-label">فاتورة بيع</span>
-        </div>
-        <div class="quick-action" onclick="App.Nav.go('invoices'); App.Invoices.openNew('purchase')">
-          <span class="qa-icon">📦</span>
-          <span class="qa-label">فاتورة شراء</span>
-        </div>
-        <div class="quick-action" onclick="App.Nav.go('payments'); App.Payments.openNew('customer_receipt')">
-          <span class="qa-icon">💵</span>
-          <span class="qa-label">قبض</span>
-        </div>
-        <div class="quick-action" onclick="App.Nav.go('payments'); App.Payments.openNew('supplier_payment')">
-          <span class="qa-icon">📤</span>
-          <span class="qa-label">صرف</span>
-        </div>
-        <div class="quick-action" onclick="App.Nav.go('parties')">
-          <span class="qa-icon">👤</span>
-          <span class="qa-label">الأطراف</span>
-        </div>
-        <div class="quick-action" onclick="App.Reports.show()">
-          <span class="qa-icon">📊</span>
-          <span class="qa-label">تقارير</span>
-        </div>
-      </div>
+    <input placeholder="بحث..." oninput="App.Parties.search(this.value)">
 
-      <div class="section-title">آخر الفواتير</div>
-      <div id="recent-invoices"><div class="skeleton"></div><div class="skeleton"></div></div>
-    </section>
+    <button onclick="App.Parties.openNew()">+ إضافة</button>
 
-    <!-- ── PARTIES (Customers + Suppliers) ───────────────── -->
-    <section class="page" id="page-parties">
-      <div class="flex items-center justify-between mb-3">
-        <h2>الأطراف</h2>
-        <div style="display:flex;gap:6px">
-          <button class="btn btn-ghost btn-sm party-tab-btn active" data-type="customer" onclick="App.Parties.setType('customer')">عملاء</button>
-          <button class="btn btn-ghost btn-sm party-tab-btn" data-type="supplier" onclick="App.Parties.setType('supplier')">موردون</button>
-        </div>
-      </div>
+    <div id="parties-list"></div>
+  </div>
 
-      <div class="search-bar">
-        <span class="search-icon">🔍</span>
-        <input type="search" id="party-search" placeholder="بحث..." oninput="App.Parties.search(this.value)" />
-      </div>
+  <!-- ================= INVOICES ================= -->
+  <div id="page-invoices" class="page">
+    <h2>الفواتير</h2>
 
-      <div id="parties-list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+    <div class="tabs">
+      <button class="inv-type-btn active" data-t="all" onclick="App.Invoices.setFilter('all')">الكل</button>
+      <button class="inv-type-btn" data-t="sale" onclick="App.Invoices.setFilter('sale')">بيع</button>
+      <button class="inv-type-btn" data-t="purchase" onclick="App.Invoices.setFilter('purchase')">شراء</button>
+    </div>
 
-      <button class="fab" onclick="App.Parties.openNew()">+</button>
-    </section>
+    <button onclick="App.Invoices.openNew()">+ فاتورة جديدة</button>
 
-    <!-- ── INVOICES ───────────────────────────────────────── -->
-    <section class="page" id="page-invoices">
-      <div class="flex items-center justify-between mb-3">
-        <h2>الفواتير</h2>
-        <div style="display:flex;gap:6px">
-          <button class="btn btn-ghost btn-sm inv-type-btn active" data-t="all" onclick="App.Invoices.setFilter('all')">الكل</button>
-          <button class="btn btn-ghost btn-sm inv-type-btn" data-t="sale" onclick="App.Invoices.setFilter('sale')">بيع</button>
-          <button class="btn btn-ghost btn-sm inv-type-btn" data-t="purchase" onclick="App.Invoices.setFilter('purchase')">شراء</button>
-        </div>
-      </div>
+    <div id="invoices-list"></div>
+  </div>
 
-      <div id="invoices-list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+  <!-- ================= PAYMENTS ================= -->
+  <div id="page-payments" class="page">
+    <h2>المدفوعات</h2>
 
-      <button class="fab" onclick="App.Invoices.openNew('sale')">+</button>
-    </section>
+    <button onclick="App.Payments.openNew()">+ حركة مالية</button>
 
-    <!-- ── PAYMENTS ───────────────────────────────────────── -->
-    <section class="page" id="page-payments">
-      <div class="flex items-center justify-between mb-3">
-        <h2>المدفوعات</h2>
-      </div>
+    <div class="totals">
+      <div>قبض اليوم: <span id="pay-receipts-today">0</span></div>
+      <div>مصروف اليوم: <span id="pay-expenses-today">0</span></div>
+    </div>
 
-      <div class="stats-grid" style="grid-template-columns:1fr 1fr;margin-bottom:14px">
-        <div class="stat-card">
-          <div class="stat-label">مقبوضات اليوم</div>
-          <div class="stat-value positive num" id="pay-receipts-today">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">مصروفات اليوم</div>
-          <div class="stat-value negative num" id="pay-expenses-today">—</div>
-        </div>
-      </div>
+    <div id="payments-list"></div>
+  </div>
 
-      <div id="payments-list"><div class="skeleton"></div><div class="skeleton"></div></div>
+  <!-- ================= REPORTS ================= -->
+  <div id="page-reports" class="page">
+    <h2>التقارير</h2>
 
-      <button class="fab" onclick="App.Payments.openNew('customer_receipt')">+</button>
-    </section>
+    <input type="date" id="rep-from">
+    <input type="date" id="rep-to">
 
-    <!-- ── REPORTS ────────────────────────────────────────── -->
-    <section class="page" id="page-reports">
-      <h2 class="mb-3">التقارير</h2>
+    <button onclick="App.Reports.load()">عرض التقرير</button>
 
-      <div class="card mb-3">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">من</label>
-            <input type="date" id="rep-from" class="form-control" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">إلى</label>
-            <input type="date" id="rep-to" class="form-control" />
-          </div>
-        </div>
-        <button class="btn btn-primary btn-full" onclick="App.Reports.load()">عرض التقرير</button>
-      </div>
+    <div id="report-output"></div>
+  </div>
 
-      <div id="report-output"></div>
-    </section>
-
-  </main>
-
-  <!-- Bottom Navigation -->
-  <nav class="bottom-nav">
-    <button class="nav-btn active" data-page="dashboard" onclick="App.Nav.go('dashboard')">
-      <span class="nav-icon">🏠</span>الرئيسية
-    </button>
-    <button class="nav-btn" data-page="parties" onclick="App.Nav.go('parties')">
-      <span class="nav-icon">👥</span>الأطراف
-    </button>
-    <button class="nav-btn" data-page="invoices" onclick="App.Nav.go('invoices')">
-      <span class="nav-icon">📋</span>الفواتير
-    </button>
-    <button class="nav-btn" data-page="payments" onclick="App.Nav.go('payments')">
-      <span class="nav-icon">💸</span>المدفوعات
-    </button>
-    <button class="nav-btn" data-page="reports" onclick="App.Nav.go('reports')">
-      <span class="nav-icon">📊</span>تقارير
-    </button>
-  </nav>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
-     BOTTOM SHEETS / MODALS
-════════════════════════════════════════════════════════ -->
+<!-- ================= OVERLAYS ================= -->
 
-<!-- Party Sheet -->
-<div class="overlay" id="overlay-party" onclick="App.closeOverlay('party')">
-  <div class="sheet" onclick="event.stopPropagation()">
-    <div class="sheet-handle"></div>
-    <h3 class="sheet-title" id="party-sheet-title">إضافة طرف جديد</h3>
+<!-- Party -->
+<div id="overlay-party" class="overlay">
+  <div class="sheet">
+    <h3 id="party-sheet-title">طرف</h3>
 
-    <input type="hidden" id="party-id" />
-    <div class="form-group">
-      <label class="form-label">النوع</label>
-      <select id="party-type" class="form-control">
-        <option value="customer">عميل</option>
-        <option value="supplier">مورد</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">الاسم *</label>
-      <input type="text" id="party-name" class="form-control" placeholder="اسم الطرف" />
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">الهاتف</label>
-        <input type="tel" id="party-phone" class="form-control" placeholder="01xxxxxxxxx" dir="ltr" />
-      </div>
-      <div class="form-group" id="party-commission-group">
-        <label class="form-label">نسبة العمولة %</label>
-        <input type="number" id="party-commission" class="form-control" placeholder="7" step="0.1" min="0" max="100" dir="ltr" />
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">ملاحظات</label>
-      <input type="text" id="party-notes" class="form-control" placeholder="أي ملاحظات..." />
-    </div>
-    <button class="btn btn-primary btn-full" onclick="App.Parties.save()">حفظ</button>
-    <button class="btn btn-ghost btn-full mt-2" onclick="App.closeOverlay('party')">إلغاء</button>
+    <input id="party-id" type="hidden">
+    <select id="party-type">
+      <option value="customer">عميل</option>
+      <option value="supplier">مورد</option>
+    </select>
+
+    <input id="party-name" placeholder="الاسم">
+    <input id="party-phone" placeholder="الموبايل">
+    <input id="party-notes" placeholder="ملاحظات">
+    <input id="party-commission" placeholder="العمولة %">
+
+    <button onclick="App.Parties.save()">حفظ</button>
+    <button onclick="App.closeOverlay('party')">إغلاق</button>
   </div>
 </div>
 
-<!-- Invoice Sheet -->
-<div class="overlay" id="overlay-invoice" onclick="App.closeOverlay('invoice')">
-  <div class="sheet" onclick="event.stopPropagation()" style="max-height:98dvh">
-    <div class="sheet-handle"></div>
-    <h3 class="sheet-title" id="invoice-sheet-title">فاتورة جديدة</h3>
+<!-- Invoice -->
+<div id="overlay-invoice" class="overlay">
+  <div class="sheet">
 
-    <input type="hidden" id="inv-id" />
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">النوع</label>
-        <select id="inv-type" class="form-control" onchange="App.Invoices.onTypeChange()">
-          <option value="sale">بيع</option>
-          <option value="purchase">شراء</option>
-          <option value="return_in">مرتجع وارد</option>
-          <option value="return_out">مرتجع صادر</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">التاريخ</label>
-        <input type="date" id="inv-date" class="form-control" />
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label" id="inv-party-label">العميل</label>
-      <select id="inv-party" class="form-control">
-        <option value="">— اختر —</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">طريقة الدفع</label>
-      <select id="inv-payment-method" class="form-control">
-        <option value="credit">آجل</option>
-        <option value="cash">نقدي</option>
-      </select>
-    </div>
+    <h3>فاتورة</h3>
 
-    <!-- Items Section -->
-    <div class="section-title">بنود الفاتورة</div>
+    <input id="inv-id" type="hidden">
+
+    <select id="inv-type" onchange="App.Invoices.onTypeChange()">
+      <option value="sale">بيع</option>
+      <option value="purchase">شراء</option>
+    </select>
+
+    <label id="inv-party-label">العميل</label>
+    <select id="inv-party"></select>
+
+    <input type="date" id="inv-date">
+
     <div id="inv-items-list"></div>
 
-    <button class="btn btn-ghost btn-full mb-3" onclick="App.Invoices.addItem()">
-      + إضافة صنف
-    </button>
+    <button onclick="App.Invoices.addItem()">+ صنف</button>
 
-    <!-- Totals -->
-    <div id="inv-totals" class="card card-sm">
-      <div class="totals-row">
-        <span class="text-muted">الإجمالي</span>
-        <span class="num font-bold" id="inv-subtotal">0.00</span>
-      </div>
-      <div class="totals-row">
-        <span class="text-muted">العمولة</span>
-        <span class="num text-green" id="inv-commission">0.00</span>
-      </div>
-      <div class="totals-row">
-        <span class="text-muted">المصاريف</span>
-        <span class="num" id="inv-expenses">0.00</span>
-      </div>
-      <div class="totals-row total-final">
-        <span>صافي المورد</span>
-        <span class="num" id="inv-net">0.00</span>
-      </div>
+    <div class="totals">
+      الإجمالي: <span id="inv-subtotal">0</span><br>
+      العمولة: <span id="inv-commission">0</span><br>
+      المصاريف: <span id="inv-expenses">0</span><br>
+      الصافي: <span id="inv-net">0</span>
     </div>
 
-    <div class="form-group mt-2">
-      <label class="form-label">ملاحظات</label>
-      <input type="text" id="inv-notes" class="form-control" placeholder="ملاحظات اختيارية..." />
-    </div>
+    <button onclick="App.Invoices.save()">حفظ</button>
+    <button id="inv-confirm-btn" onclick="App.Invoices.confirm()">ترحيل</button>
 
-    <button class="btn btn-primary btn-full" onclick="App.Invoices.save()">حفظ مسودة</button>
-    <button class="btn btn-ghost btn-full mt-2" id="inv-confirm-btn" onclick="App.Invoices.confirm()" style="display:none">
-      ✅ تأكيد وترحيل
-    </button>
-    <button class="btn btn-ghost btn-full mt-2" onclick="App.closeOverlay('invoice')">إلغاء</button>
+    <button onclick="App.closeOverlay('invoice')">إغلاق</button>
+
   </div>
 </div>
 
-<!-- Invoice Item Row Template (used by JS) -->
+<!-- Payment -->
+<div id="overlay-payment" class="overlay">
+  <div class="sheet">
+
+    <h3>حركة مالية</h3>
+
+    <select id="pay-type" onchange="App.Payments.onTypeChange()">
+      <option value="customer_receipt">قبض من عميل</option>
+      <option value="supplier_payment">دفع لمورد</option>
+    </select>
+
+    <div id="pay-party-group">
+      <label id="pay-party-label">الطرف</label>
+      <select id="pay-party"></select>
+    </div>
+
+    <input id="pay-amount" placeholder="المبلغ">
+    <input type="date" id="pay-date">
+    <input id="pay-notes" placeholder="ملاحظات">
+
+    <button onclick="App.Payments.save()">حفظ</button>
+    <button onclick="App.closeOverlay('payment')">إغلاق</button>
+
+  </div>
+</div>
+
+<!-- Item Template -->
 <template id="inv-item-tpl">
-  <div class="card card-sm mb-2 inv-item-row" data-index="">
-    <div class="flex items-center justify-between mb-2">
-      <span class="font-bold text-sm">صنف</span>
-      <button class="btn btn-danger btn-sm" onclick="App.Invoices.removeItem(this)">✕</button>
-    </div>
-    <div class="form-group">
-      <input type="text" class="form-control item-product" placeholder="اسم الصنف *" />
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <input type="number" class="form-control item-qty" placeholder="الكمية" step="0.5" min="0" dir="ltr" oninput="App.Invoices.calcTotals()" />
-      </div>
-      <div class="form-group">
-        <input type="number" class="form-control item-price" placeholder="السعر" step="0.01" min="0" dir="ltr" oninput="App.Invoices.calcTotals()" />
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <input type="number" class="form-control item-transport" placeholder="نولون" step="0.01" min="0" dir="ltr" oninput="App.Invoices.calcTotals()" />
-      </div>
-      <div class="form-group">
-        <input type="number" class="form-control item-loading" placeholder="مشال" step="0.01" min="0" dir="ltr" oninput="App.Invoices.calcTotals()" />
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <input type="number" class="form-control item-stacking" placeholder="رص" step="0.01" min="0" dir="ltr" oninput="App.Invoices.calcTotals()" />
-      </div>
-      <div class="form-group">
-        <input type="number" class="form-control item-gate" placeholder="بوابة" step="0.01" min="0" dir="ltr" oninput="App.Invoices.calcTotals()" />
-      </div>
-    </div>
-    <div class="text-sm text-muted inv-item-line-total" style="text-align:left">الإجمالي: 0.00 ج</div>
+  <div class="inv-item-row">
+    <input class="item-product" placeholder="الصنف">
+    <input class="item-qty" placeholder="الكمية" oninput="App.Invoices.calcTotals()">
+    <input class="item-price" placeholder="السعر" oninput="App.Invoices.calcTotals()">
+    <button onclick="App.Invoices.removeItem(this)">حذف</button>
   </div>
 </template>
 
-<!-- Payment Sheet -->
-<div class="overlay" id="overlay-payment" onclick="App.closeOverlay('payment')">
-  <div class="sheet" onclick="event.stopPropagation()">
-    <div class="sheet-handle"></div>
-    <h3 class="sheet-title">تسجيل حركة مالية</h3>
-
-    <div class="form-group">
-      <label class="form-label">النوع</label>
-      <select id="pay-type" class="form-control" onchange="App.Payments.onTypeChange()">
-        <option value="customer_receipt">قبض من عميل</option>
-        <option value="supplier_payment">صرف لمورد</option>
-        <option value="expense_payment">مصروف</option>
-        <option value="cash_in">إيداع نقدي</option>
-        <option value="cash_out">سحب نقدي</option>
-      </select>
-    </div>
-    <div class="form-group" id="pay-party-group">
-      <label class="form-label" id="pay-party-label">الطرف</label>
-      <select id="pay-party" class="form-control">
-        <option value="">— اختر —</option>
-      </select>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">المبلغ *</label>
-        <input type="number" id="pay-amount" class="form-control" placeholder="0.00" step="0.01" min="0" dir="ltr" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">التاريخ</label>
-        <input type="date" id="pay-date" class="form-control" />
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">طريقة الدفع</label>
-      <select id="pay-method" class="form-control">
-        <option value="cash">نقدي</option>
-        <option value="bank_transfer">تحويل بنكي</option>
-        <option value="check">شيك</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">ملاحظات / مرجع</label>
-      <input type="text" id="pay-notes" class="form-control" placeholder="رقم شيك، ملاحظة..." />
-    </div>
-    <button class="btn btn-primary btn-full" onclick="App.Payments.save()">تسجيل</button>
-    <button class="btn btn-ghost btn-full mt-2" onclick="App.closeOverlay('payment')">إلغاء</button>
-  </div>
-</div>
-
+<!-- Script -->
 <script src="app.js"></script>
+
 </body>
 </html>
